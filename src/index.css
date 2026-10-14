@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #6B3216;      /* tombol utama, harga, link, item aktif */
+  --color-caramel: #C47A3A;      /* aksen, status berjalan */
+  --color-promo: #9A5A1C;        /* link sekunder */
+  --color-ink: #2B1810;          /* teks utama, latar halaman Login */
+  --color-secondary: #5A4436;    /* label sekunder */
+  --color-muted: #7A6355;        /* teks meta, ikon tidak aktif */
+  --color-disabled: #B9A89B;     /* tombol nonaktif */
+  --color-bg: #FFFFFF;           /* latar konten */
+  --color-surface: #FCF9F5;      /* sidebar, card, modal */
+  --color-fill: #F3EADF;         /* isi input, chip tidak terpilih */
+  --color-tint: #F1E4D4;         /* placeholder thumbnail, avatar, hover baris */
+  --color-cream: #FBEFE0;        /* teks terang di atas cokelat tua */
+  --color-divider: #EDE3D8;      /* garis umum, border tabel */
+  --color-outline: #E6D9CB;      /* border tombol sekunder, input */
+  --color-pending: #D9CABB;      /* status belum tercapai */
+  --color-danger: #B3261E;       /* khusus aksi Batalkan/Hapus (tambahan web) */
+
+  --radius-thumb: 6px;
+  --radius-input: 8px;
+  --radius-btn: 8px;
+  --radius-card: 10px;
+  --radius-panel: 12px;
+
+  --shadow-card: 0 2px 10px rgba(60, 30, 10, 0.05);
+  --shadow-float: 0 6px 20px rgba(43, 24, 16, 0.07);
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+}

@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function masuk() { return request.auth != null; }
+    function role() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function staf() { return masuk() && role() in ['staf', 'admin']; }
+    function admin() { return masuk() && role() == 'admin'; }
+    function hanyaUbah(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    match /users/{uid} {
+      allow read: if masuk() && (request.auth.uid == uid || staf());
+      // Daftar dari app: hanya boleh membuat dirinya sendiri sebagai pelanggan
+      allow create: if masuk() && request.auth.uid == uid
+                    && request.resource.data.role == 'pelanggan';
+      // Pelanggan hanya boleh ubah nama/favorit/notifikasi; role & voucher diatur admin
+      allow update: if admin()
+                    || (request.auth.uid == uid && hanyaUbah(['nama', 'favorit', 'notifikasi']));
+      allow delete: if admin();
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow update: if admin() || (staf() && hanyaUbah(['habis']));
+      allow create, delete: if admin();
+    }
+
+    match /config/{id} {
+      allow read: if true;
+      allow write: if admin();
+    }
+
+    match /vouchers/{kode} {
+      allow read: if masuk();
+      allow write: if admin();
+    }
+
+    match /orders/{id} {
+      allow read: if masuk() && (resource.data.uid == request.auth.uid || staf());
+      allow create: if masuk() && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'menunggu_bayar';
+      allow update: if staf()
+                    || (masuk() && resource.data.uid == request.auth.uid
+                        && resource.data.status == 'menunggu_bayar'
+                        && request.resource.data.status == 'batal'
+                        && hanyaUbah(['status', 'updatedAt']));
+      allow delete: if admin();
+    }
+
+    // ponytail: nomor antrean dinaikkan dari app (tanpa Cloud Functions), jadi
+    // pengguna yang login bisa menulis counter. Cukup untuk demo; pindah ke
+    // Cloud Function bila dipakai sungguhan.
+    match /counters/{id} {
+      allow read, write: if masuk();
+    }
+  }
+}
