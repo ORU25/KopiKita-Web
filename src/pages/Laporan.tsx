@@ -68,7 +68,7 @@ export default function Laporan() {
         hasil && (
           // Saat memuat ulang, data lama tetap tampil tapi diredupkan.
           <div className={`flex flex-col gap-6 transition-opacity ${status === 'memuat' ? 'pointer-events-none opacity-50' : ''}`}>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid gap-4 sm:grid-cols-3">
               <KartuRingkas label="Omzet" nilai={rupiah(hasil.total.omzet)} />
               <KartuRingkas label="Pesanan selesai" nilai={String(hasil.total.selesai)} />
               <KartuRingkas label="Dibatalkan" nilai={String(hasil.total.batal)} />
@@ -151,7 +151,7 @@ const KartuRingkas = ({ label, nilai }: { label: string; nilai: string }) => (
 
 const SkeletonLaporan = () => (
   <Memuat className="flex flex-col gap-6">
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid gap-4 sm:grid-cols-3">
       {[0, 1, 2].map((i) => (
         <div key={i} className="flex flex-col gap-2 rounded-card border border-divider p-5">
           <Skeleton className="h-4 w-24" />

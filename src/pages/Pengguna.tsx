@@ -67,7 +67,7 @@ export default function Pengguna() {
   return (
     <div>
       <Header judul="Pengguna">
-        <div className="relative w-72">
+        <div className="relative w-72 max-w-full">
           <Search size={18} className="absolute top-3 left-4 text-muted" />
           <input
             type="search"
@@ -83,7 +83,7 @@ export default function Pengguna() {
       {galat ? (
         <Galat onUlang={() => (setGalat(false), setUlang((x) => x + 1))} />
       ) : !pengguna ? (
-        <SkeletonTabel kolom={['Pengguna', 'Role', 'Voucher', 'Aksi']} kanan={[2, 3]} awal="avatar" baris={5} />
+        <SkeletonTabel kolom={['Pengguna', 'Role', 'Voucher', 'Aksi']} kanan={[2, 3]} sembunyi={[2]} awal="avatar" baris={5} />
       ) : tampil.length === 0 ? (
         <Kosong pesan={k ? 'Tidak ada pengguna yang cocok' : 'Belum ada pengguna'} />
       ) : (
@@ -93,7 +93,7 @@ export default function Pengguna() {
               <tr>
                 <th className={thCls}>Pengguna</th>
                 <th className={thCls}>Role</th>
-                <th className={`${thCls} text-right`}>Voucher</th>
+                <th className={`${thCls} text-right max-md:hidden`}>Voucher</th>
                 <th className={`${thCls} text-right`}>Aksi</th>
               </tr>
             </thead>
@@ -116,7 +116,7 @@ export default function Pengguna() {
                       // Admin tidak bisa menurunkan dirinya sendiri.
                       disabled={u.id === profil?.id}
                       onChange={(e) => setUbahRole({ u, role: e.target.value as Role })}
-                      className={`${inputCls} w-40`}
+                      className={`${inputCls} w-40 min-w-36`}
                     >
                       {Object.entries(ROLE_LABEL).map(([r, l]) => (
                         <option key={r} value={r}>
@@ -125,7 +125,7 @@ export default function Pengguna() {
                       ))}
                     </select>
                   </td>
-                  <td className={`${tdCls} text-right`}>{u.voucher?.length ?? 0}</td>
+                  <td className={`${tdCls} text-right max-md:hidden`}>{u.voucher?.length ?? 0}</td>
                   <td className={`${tdCls} text-right`}>
                     <Button varian="sekunder" onClick={() => setAturVoucher(u)}>
                       Atur voucher

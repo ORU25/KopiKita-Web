@@ -16,7 +16,7 @@ function pesanGalat(e: unknown) {
 }
 
 export default function Login() {
-  const { error: galatAuth } = useAuth();
+  const { error: galatAuth, loading: cekProfil } = useAuth();
   const [email, setEmail] = useState('');
   const [sandi, setSandi] = useState('');
   const [lihat, setLihat] = useState(false);
@@ -37,11 +37,13 @@ export default function Login() {
     }
   }
 
-  const pesan = galat || galatAuth;
+  // Setelah login berhasil, tombol tetap sibuk sampai role selesai dicek.
+  const sibuk = loading || cekProfil;
+  const pesan = sibuk ? '' : galat || galatAuth;
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-ink p-4">
-      <form onSubmit={masuk} className="flex w-full max-w-[400px] flex-col gap-4 rounded-panel bg-bg p-8 shadow-float">
+      <form onSubmit={masuk} className="flex w-full max-w-[400px] flex-col gap-4 rounded-panel bg-bg p-6 shadow-float sm:p-8">
         <div className="mb-2 flex flex-col items-center gap-1 text-center">
           <img src="/logo-app.png" alt="" className="mb-2 size-[72px] rounded-full bg-bg" />
           <h1 className="text-2xl font-extrabold">KopiKita</h1>
@@ -75,8 +77,8 @@ export default function Login() {
 
         {pesan && <p className="text-xs font-semibold text-danger">{pesan}</p>}
 
-        <Button type="submit" disabled={loading} className="mt-2 w-full">
-          {loading ? 'Masuk…' : 'Masuk'}
+        <Button type="submit" disabled={sibuk} className="mt-2 w-full">
+          {sibuk ? 'Masuk…' : 'Masuk'}
         </Button>
       </form>
     </div>

@@ -20,6 +20,9 @@ import { AKSI_BERIKUT, labelOpsi, STATUS_LABEL, type OrderItem, type Pesanan, ty
 
 const KOLOM: Status[] = ['menunggu_bayar', 'dibayar', 'diproses', 'siap'];
 const SOROT_MS = 10_000;
+// HP: kolom digeser ke samping (lebar 85% agar kolom berikutnya mengintip); md ke atas 4 kolom.
+const papanCls =
+  'grid min-h-0 flex-1 gap-4 max-md:-mx-4 max-md:auto-cols-[85%] max-md:grid-flow-col max-md:snap-x max-md:snap-mandatory max-md:scroll-px-4 max-md:overflow-x-auto max-md:px-4 max-md:[scrollbar-width:none] md:grid-cols-4';
 
 export default function Antrean() {
   const toast = useToast();
@@ -95,11 +98,11 @@ export default function Antrean() {
         <SkeletonPapan />
       ) : (
         // Papan selalu tampil (juga saat kosong) agar posisi kolom tidak berubah-ubah.
-        <div className="grid min-h-0 flex-1 grid-cols-4 gap-4">
+        <div className={papanCls}>
           {KOLOM.map((s) => {
             const isi = aktif.filter((p) => p.status === s);
             return (
-              <section key={s} className="flex min-h-0 min-w-0 flex-col gap-3">
+              <section key={s} className="flex min-h-0 min-w-0 snap-start flex-col gap-3">
                 <div className="flex flex-col gap-2">
                   <h2 className="flex items-center justify-between gap-2 text-base font-extrabold">
                     {STATUS_LABEL[s]}
@@ -156,9 +159,9 @@ const WARNA: Partial<Record<Status, string>> = {
 
 // Papan saat data pertama belum datang: 4 kolom, kartu abu berdenyut.
 const SkeletonPapan = () => (
-  <Memuat className="grid min-h-0 flex-1 grid-cols-4 gap-4">
+  <Memuat className={papanCls}>
     {KOLOM.map((s, k) => (
-      <div key={s} className="flex flex-col gap-3">
+      <div key={s} className="flex snap-start flex-col gap-3">
         <div className="flex flex-col gap-2">
           <h2 className="text-base font-extrabold">{STATUS_LABEL[s]}</h2>
           <div className={`h-1 rounded-full opacity-40 ${WARNA[s]}`} />

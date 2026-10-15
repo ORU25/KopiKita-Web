@@ -2,7 +2,7 @@
 
 Sumber kebenaran untuk tampilan dasbor. Token warna, font, dan bayangan **sama dengan aplikasi pelanggan** (`../kopikita/kopikita-design/design/DESIGN.md`) agar terasa satu merek. **Radius web lebih kecil** daripada mobile (permintaan user: tampilan tidak terlalu melengkung), dan **card/tabel/modal/input berlatar putih (`bg`)** dengan garis `divider`/`outline` — bukan krem. Dasbor belum punya gambar desain — spesifikasi di bawah adalah acuannya. Setiap perubahan UI wajib diperbarui di sini.
 
-- Target layar: **laptop 1280×800** (admin) dan **tablet 1024×768 landscape** (kasir/barista). Masih bisa dipakai di 768 lebar; di bawah itu tidak perlu dioptimalkan.
+- Target layar: **laptop 1280×800** (admin) dan **tablet 1024×768 landscape** (kasir/barista). Masih bisa dipakai di 768 lebar. **HP (< 768)** juga didukung — lihat aturan "HP" di tiap bagian.
 - Gaya: bersih, hangat, minimalis. Daftar panjang memakai **tabel/baris datar**, bukan tumpukan card. Card hanya untuk kartu pesanan di Antrean dan panel ringkasan.
 - Bahasa UI: Bahasa Indonesia. Teks minimal **12px**. Target klik minimal **44×44**.
 
@@ -92,6 +92,7 @@ Ikon garis (outline) 20–24, stroke ~1.8, gaya Lucide. Boleh pakai `lucide-reac
 - Bawah sidebar: avatar inisial 36 (latar `tint`, teks `primary` 800) + nama 13/700 + role 12 muted + tombol **Keluar** (sekunder kecil).
 - **Konten** di kanan: latar `bg`, padding 24. Header halaman tinggi 72: judul 24/800 di kiri, aksi utama (mis. "+ Tambah menu") di kanan.
 - Di bawah lebar 1280 (tablet 1024) sidebar menyempit jadi 72 (ikon saja + tooltip `title`); mulai 1280 lebar 240. Tidak perlu hamburger.
+- **HP (< 768)**: sidebar pindah jadi **bilah navigasi bawah** (latar `surface`, border atas `divider`, padding 4): ikon saja, item sama lebar (tinggi 44), urutan sama + tombol Keluar (ikon, tanpa border) paling kanan. Logo, garis pemisah, dan profil disembunyikan. Padding konten 16.
 
 ### Tombol
 - Utama: tinggi 44, radius 8, latar `primary`, teks putih 14/700, padding x 20. Nonaktif: latar `disabled`.
@@ -105,6 +106,7 @@ Tinggi 44, radius 8, latar `bg`, border 1 `outline`; fokus: border + ring 1 `pri
 
 ### Tabel
 Wadah `bg` (putih) radius 10 border `divider` (overflow hidden). Header 12/700 uppercase `muted`, tinggi 44, latar `bg` + border bawah `divider`. Baris tinggi 56, border bawah `divider`, hover latar `ink/4`. Kolom angka rata kanan. Thumbnail 40 radius 6.
+- **HP (< 768)**: tabel tetap tabel dan digeser ke samping (wadah `overflow-x-auto`). Kolom sekunder disembunyikan (`max-md:hidden`, skeleton ikut lewat prop `sembunyi`): Menu → Kategori & Urutan · Voucher → Info · Pengguna → jumlah Voucher.
 
 ### Toggle (Habis, Aktif, Rekomendasi)
 Track 44×24 radius penuh; aktif latar `primary`, nonaktif `pending`; knob putih 20. Area klik ≥ 44. Simpan langsung saat diklik (tanpa tombol Simpan), tampilkan toast singkat.
@@ -123,10 +125,10 @@ Tinggi 24, padding x 10, radius 6, 12/700:
 Badge metode: ikon 13 (tas belanja / alat makan) + "Ambil sendiri" / "Makan di tempat · Meja 7" — latar `tint`, teks `primary` 12/700.
 
 ### Modal
-Overlay `ink` opacity 40%. Panel `bg` radius 12, lebar 480 (form) / 400 (konfirmasi), padding 24, bayangan `float`. Judul 20/800, footer tombol rata kanan (Batal sekunder + aksi utama). Tutup dengan Esc / klik overlay.
+Overlay `ink` opacity 40%. Panel `bg` radius 12, lebar 480 (form) / 400 (konfirmasi), padding 24 (HP: 20), bayangan `float`. Judul 20/800, footer tombol rata kanan (Batal sekunder + aksi utama). Tutup dengan Esc / klik overlay.
 
 ### Toast
-Pojok kanan bawah, latar `ink`, teks `cream` 13/600, radius 8, hilang 3 detik. Untuk "Tersimpan", "Status diubah ke Diproses", dan pesan error.
+Pojok kanan bawah (HP: 80 dari bawah, di atas bilah navigasi), latar `ink`, teks `cream` 13/600, radius 8, hilang 3 detik. Untuk "Tersimpan", "Status diubah ke Diproses", dan pesan error.
 
 ### Keadaan kosong / loading / error
 - Loading: **skeleton** — balok abu netral `ink/6` berdenyut (`animate-pulse`), radius 6, yang meniru bentuk konten aslinya agar tata letak tidak melompat. Wadah `role="status"` dengan teks tersembunyi "Memuat…" untuk pembaca layar.
@@ -134,7 +136,9 @@ Pojok kanan bawah, latar `ink`, teks `cream` 13/600, radius 8, hilang 3 detik. U
   - Antrean: 4 kolom dengan judul asli, garis status redup, 1–2 kartu skeleton (nomor, badge, item, tombol).
   - Laporan: 3 kartu ringkasan + 2 tabel skeleton. Muat ulang saat data sudah ada: data lama diredupkan (opacity 50%) dan tombol berubah "Memuat…".
   - Panel kustomisasi & modal Atur voucher: balok seukuran input/baris checkbox.
-  - Cek sesi login: kerangka dasbor (sidebar + header + blok konten); di `/login` cukup logo berdenyut di atas latar `ink`.
+  - **Loading awal (splash)**: latar `bg`, di tengah logo 72 bulat · "KopiKita" 20/800 `ink` · bilah progres 160×4 radius penuh (jalur `ink/6`, isi 1/3 `primary` bergerak kiri→kanan 1,1 dtk; diam bila *reduced motion*). Splash yang sama ditulis di `index.html` (tampil sebelum JS selesai diunduh) dan sebagai `<Splash />` di `App.tsx` (selama sesi pertama dicek) — keduanya harus identik agar tidak berkedip.
+  - Profil terakhir disimpan di `localStorage`, jadi saat dasbor dibuka lagi splash dilewati dan halaman langsung tampil (role dicek ulang di belakang). Saat tombol **Masuk** ditekan, form Login tetap tampil dan tombol berisi "Masuk…" sampai role selesai dicek.
+  - Logo `public/logo-app.png` berukuran 256×256 (±70 KB) — cukup untuk tampilan 72 px di layar 2×; jangan ganti dengan file resolusi penuh.
 - Kosong: ikon 40 `pending` + kalimat 14/600 `muted` (mis. "Belum ada pesanan hari ini").
 - Error: kalimat 14/600 `danger` + tombol sekunder "Coba lagi".
 
@@ -143,7 +147,7 @@ Pojok kanan bawah, latar `ink`, teks `cream` 13/600, radius 8, hilang 3 detik. U
 ## 3. Halaman
 
 ### 3.1 Login (`/login`)
-- Latar halaman `ink`. Di tengah: card `bg` lebar 400, radius 12, padding 32, bayangan `float`.
+- Latar halaman `ink`. Di tengah: card `bg` lebar 400, radius 12, padding 32 (HP < 640: 24), bayangan `float`.
 - Isi: logo 72 (bulat latar `bg`) di tengah → "KopiKita" 24/800 → "Dasbor staf & admin" 13 muted → field **Email** → field **Kata sandi** (tombol mata 44) → tombol utama **Masuk** lebar penuh.
 - Error (Bahasa Indonesia): kredensial salah → "Email atau kata sandi salah."; role `pelanggan` → logout otomatis + "Akun ini bukan akun staf/admin."
 - Tidak ada Daftar dan tidak ada login Google (akun staf dibuat dengan daftar di app lalu role dinaikkan admin).
@@ -163,6 +167,7 @@ Halaman utama kasir/barista, realtime.
   4. Tombol utama lebar penuh sesuai status (Konfirmasi bayar / Proses / Siap / Selesai; saat menyimpan "Menyimpan…") + tombol bahaya "Batalkan" 13/700 di bawahnya (modal konfirmasi: "Batalkan pesanan A-014?").
 - Pesanan baru masuk: border kartu `caramel` + ring 1 `caramel` (tampak 2px) + badge "Baru" selama 10 detik.
 - Pesanan `selesai`/`batal` hilang dari papan (masuk hitungan ringkasan).
+- **HP (< 768)**: papan jadi satu baris kolom selebar 85% layar yang digeser ke samping (*scroll snap* per kolom, scrollbar disembunyikan) — kolom berikutnya mengintip di kanan sebagai petunjuk geser. Kotak angka & tombol header turun ke baris baru.
 - Khusus mode dev: tombol sekunder "+ Pesanan contoh" di kanan header (tidak ada di build produksi).
 
 ### 3.3 Stok (`/stok`) — staf & admin
@@ -179,7 +184,7 @@ Halaman utama kasir/barista, realtime.
   - Bagian **Kustomisasi** (dipisah garis `divider`, judul 16/800 + "Pilihan yang muncul di aplikasi saat pelanggan memesan menu ini." 12 muted). Semua pilihan berupa checkbox dengan area klik ≥ 44:
     - Hanya minuman (Kopi/Non-Kopi): **Suhu** Panas · Es (minimal satu; error "Pilih minimal satu suhu.") · **Ukuran** "Ada ukuran Large (+Rp4.000)" · **Add-on** · catatan 12 muted "Level gula dan level es (bila Es) selalu tersedia untuk minuman."
     - Makanan: tidak ada pilihan; tampil teks 13 muted "Makanan tidak punya pilihan kustomisasi. Pelanggan tetap bisa menulis catatan." Disimpan sebagai suhu `[]`, tanpa Large, tanpa add-on.
-    - Add-on: daftar dari katalog, 2 kolom, "Extra shot +Rp5.000" (harga 500 muted). Katalog kosong: "Katalog add-on masih kosong. Tambahkan lewat kartu "Katalog add-on minuman"."
+    - Add-on: daftar dari katalog, 2 kolom (HP < 640: 1 kolom), "Extra shot +Rp5.000" (harga 500 muted). Katalog kosong: "Katalog add-on masih kosong. Tambahkan lewat kartu "Katalog add-on minuman"."
     - Produk lama tanpa field kustomisasi: modal membuka dengan nilai default (minuman semua tercentang); saat disimpan nilainya ditulis eksplisit.
 - Hapus: modal konfirmasi "Hapus Kopi Susu Kita dari menu?".
 - Seksi **Kustomisasi minuman** (`config/menu`) di bawah tabel: judul 16/800 + "Berlaku untuk semua minuman. Pilihan per menu (suhu, Large, add-on) diatur lewat tombol Edit di tabel." 13 muted. Isi 2 kartu (≥1280: 320 | sisa, gap 16, rata atas; di bawahnya bertumpuk). Kartu: `bg`, border `divider`, radius 10; header tinggi min 72 (judul 16/800 + keterangan 13 muted, aksi di kanan) dengan border bawah `divider`.
@@ -202,7 +207,7 @@ Halaman utama kasir/barista, realtime.
 
 ### 3.7 Laporan (`/laporan`) — admin
 - Pilihan rentang: chip "Hari ini · 7 hari · 30 hari" + tombol "Muat" (pakai `getDocs`, bukan realtime).
-- 3 kartu ringkasan (`bg`, border `divider`, radius 10, padding 20): **Omzet** (16/800 `primary` → angka 24/800) · **Pesanan selesai** · **Dibatalkan**.
+- 3 kartu ringkasan (`bg`, border `divider`, radius 10, padding 20; HP < 640 bertumpuk 1 kolom): **Omzet** (16/800 `primary` → angka 24/800) · **Pesanan selesai** · **Dibatalkan**.
 - Tabel per hari: tanggal · pesanan selesai · dibatalkan · omzet (jumlah `total` pesanan `selesai`), baris total di bawah (800, border atas `outline`).
 - Tabel **Menu terlaris** (top 5 dari `items` pesanan selesai): nama · jumlah terjual · pendapatan.
 - Grafik tidak wajib; tambah hanya bila waktu tersisa.

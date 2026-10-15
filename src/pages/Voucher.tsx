@@ -75,7 +75,7 @@ export default function Voucher() {
       {galat ? (
         <Galat onUlang={() => (setGalat(false), setUlang((x) => x + 1))} />
       ) : !voucher ? (
-        <SkeletonTabel kolom={['Kode', 'Info', 'Nilai', 'Min. belanja', 'Berlaku sampai', 'Aktif', 'Aksi']} kanan={[2, 3, 6]} baris={3} />
+        <SkeletonTabel kolom={['Kode', 'Info', 'Nilai', 'Min. belanja', 'Berlaku sampai', 'Aktif', 'Aksi']} kanan={[2, 3, 6]} sembunyi={[1]} baris={3} />
       ) : voucher.length === 0 ? (
         <Kosong pesan="Belum ada voucher" />
       ) : (
@@ -84,7 +84,7 @@ export default function Voucher() {
             <thead>
               <tr>
                 <th className={thCls}>Kode</th>
-                <th className={thCls}>Info</th>
+                <th className={`${thCls} max-md:hidden`}>Info</th>
                 <th className={`${thCls} text-right`}>Nilai</th>
                 <th className={`${thCls} text-right`}>Min. belanja</th>
                 <th className={thCls}>Berlaku sampai</th>
@@ -98,10 +98,10 @@ export default function Voucher() {
                 return (
                   <tr key={v.id} className={trCls}>
                     <td className={`${tdCls} font-extrabold text-primary`}>{v.id}</td>
-                    <td className={tdCls}>{v.info}</td>
+                    <td className={`${tdCls} max-md:hidden`}>{v.info}</td>
                     <td className={`${tdCls} text-right`}>{nilaiVoucher(v)}</td>
                     <td className={`${tdCls} text-right`}>{rupiah(v.minBelanja)}</td>
-                    <td className={`${tdCls} ${lewat ? 'text-danger' : ''}`}>
+                    <td className={`${tdCls} whitespace-nowrap ${lewat ? 'text-danger' : ''}`}>
                       {v.berlakuSampai ? tanggal(v.berlakuSampai) : 'Tanpa batas'}
                     </td>
                     <td className={`${tdCls} text-center`}>

@@ -115,7 +115,7 @@ export default function Menu() {
       {galat ? (
         <Galat onUlang={muatUlang} />
       ) : !produk ? (
-        <SkeletonTabel kolom={['Foto', 'Nama', 'Kategori', 'Harga', 'Rekomendasi', 'Habis', 'Urutan', 'Aksi']} kanan={[3, 6, 7]} awal="thumb" baris={8} />
+        <SkeletonTabel kolom={['Foto', 'Nama', 'Kategori', 'Harga', 'Rekomendasi', 'Habis', 'Urutan', 'Aksi']} kanan={[3, 6, 7]} sembunyi={[2, 6]} awal="thumb" baris={8} />
       ) : tampil.length === 0 ? (
         <Kosong pesan="Belum ada menu" />
       ) : (
@@ -125,11 +125,11 @@ export default function Menu() {
               <tr>
                 <th className={thCls}>Foto</th>
                 <th className={thCls}>Nama</th>
-                <th className={thCls}>Kategori</th>
+                <th className={`${thCls} max-md:hidden`}>Kategori</th>
                 <th className={`${thCls} text-right`}>Harga</th>
                 <th className={`${thCls} text-center`}>Rekomendasi</th>
                 <th className={`${thCls} text-center`}>Habis</th>
-                <th className={`${thCls} text-right`}>Urutan</th>
+                <th className={`${thCls} text-right max-md:hidden`}>Urutan</th>
                 <th className={`${thCls} text-right`}>Aksi</th>
               </tr>
             </thead>
@@ -139,11 +139,11 @@ export default function Menu() {
                   <td className={tdCls}>
                     <Thumb url={p.gambarUrl} />
                   </td>
-                  <td className={`${tdCls} max-w-72`}>
+                  <td className={`${tdCls} max-w-72 min-w-40`}>
                     <p className="font-bold">{p.nama}</p>
                     <p className="truncate text-xs font-medium text-muted">{p.deskripsi}</p>
                   </td>
-                  <td className={tdCls}>{p.kategori}</td>
+                  <td className={`${tdCls} max-md:hidden`}>{p.kategori}</td>
                   <td className={`${tdCls} text-right font-extrabold text-primary`}>{rupiah(p.harga)}</td>
                   <td className={`${tdCls} text-center`}>
                     <Toggle aktif={p.rekomendasi} label={`${p.nama} rekomendasi`} onChange={(v) => ubah(p, { rekomendasi: v })} />
@@ -151,7 +151,7 @@ export default function Menu() {
                   <td className={`${tdCls} text-center`}>
                     <Toggle aktif={p.habis} label={`${p.nama} habis`} onChange={(v) => ubah(p, { habis: v })} />
                   </td>
-                  <td className={`${tdCls} text-right`}>{p.urutan}</td>
+                  <td className={`${tdCls} text-right max-md:hidden`}>{p.urutan}</td>
                   <td className={`${tdCls} text-right whitespace-nowrap`}>
                     <button
                       type="button"
@@ -378,7 +378,7 @@ function FormMenu({ awal, config, urutanBaru, onClose }: FormMenuProps) {
                 {katalog.length === 0 ? (
                   <p className="py-2 text-[13px] text-muted">Katalog add-on masih kosong. Tambahkan lewat kartu "Katalog add-on minuman".</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-x-4">
+                  <div className="grid gap-x-4 sm:grid-cols-2">
                     {katalog.map((a) => (
                       <Cek key={a} checked={addOn.includes(a)} onChange={(v) => setAddOn(pilih(addOn, a, v))}>
                         {a} <span className="font-medium text-muted">+{rupiah(config.addOn[a])}</span>
@@ -574,38 +574,40 @@ function KartuAddOn({ config, produk, onTersimpan }: { config: ConfigMenu; produ
       {katalog.length === 0 ? (
         <Kosong pesan="Belum ada add-on" />
       ) : (
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th className={thCls}>Add-on</th>
-              <th className={`${thCls} text-right`}>Harga</th>
-              <th className={`${thCls} text-right`}>Dipakai di</th>
-              <th className={`${thCls} text-right`}>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {katalog.map((a) => {
-              const dipakai = pemakai(a);
-              return (
-                <tr key={a} className={trCls}>
-                  <td className={`${tdCls} font-bold`}>{a}</td>
-                  <td className={`${tdCls} text-right font-extrabold text-primary`}>+{rupiah(config.addOn[a])}</td>
-                  <td className={`${tdCls} text-right ${dipakai.length ? '' : 'text-muted'}`} title={dipakai.map((p) => p.nama).join(', ')}>
-                    {dipakai.length ? `${dipakai.length} minuman` : 'Belum dipakai'}
-                  </td>
-                  <td className={`${tdCls} text-right whitespace-nowrap`}>
-                    <button type="button" className={`${ikonBtn} text-secondary`} title="Edit" aria-label={`Edit ${a}`} onClick={() => setForm(a)}>
-                      <Pencil size={18} strokeWidth={1.8} />
-                    </button>
-                    <button type="button" className={`${ikonBtn} text-danger`} title="Hapus" aria-label={`Hapus ${a}`} onClick={() => setHapus(a)}>
-                      <Trash2 size={18} strokeWidth={1.8} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th className={thCls}>Add-on</th>
+                <th className={`${thCls} text-right`}>Harga</th>
+                <th className={`${thCls} text-right`}>Dipakai di</th>
+                <th className={`${thCls} text-right`}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {katalog.map((a) => {
+                const dipakai = pemakai(a);
+                return (
+                  <tr key={a} className={trCls}>
+                    <td className={`${tdCls} font-bold`}>{a}</td>
+                    <td className={`${tdCls} text-right font-extrabold text-primary`}>+{rupiah(config.addOn[a])}</td>
+                    <td className={`${tdCls} text-right ${dipakai.length ? '' : 'text-muted'}`} title={dipakai.map((p) => p.nama).join(', ')}>
+                      {dipakai.length ? `${dipakai.length} minuman` : 'Belum dipakai'}
+                    </td>
+                    <td className={`${tdCls} text-right whitespace-nowrap`}>
+                      <button type="button" className={`${ikonBtn} text-secondary`} title="Edit" aria-label={`Edit ${a}`} onClick={() => setForm(a)}>
+                        <Pencil size={18} strokeWidth={1.8} />
+                      </button>
+                      <button type="button" className={`${ikonBtn} text-danger`} title="Hapus" aria-label={`Hapus ${a}`} onClick={() => setHapus(a)}>
+                        <Trash2 size={18} strokeWidth={1.8} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {form !== null && (

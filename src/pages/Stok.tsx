@@ -36,7 +36,7 @@ export default function Stok() {
               <tr>
                 <th className={thCls}>Menu</th>
                 <th className={`${thCls} text-right`}>Harga</th>
-                <th className={`${thCls} w-40 text-right`}>Tersedia</th>
+                <th className={`${thCls} text-right md:w-40`}>Tersedia</th>
               </tr>
             </thead>
             {KATEGORI.map((k) => {

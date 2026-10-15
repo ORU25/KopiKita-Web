@@ -81,7 +81,7 @@ export function Modal({ judul, onClose, children, footer, lebar = 'form' }: Moda
         aria-modal="true"
         aria-label={judul}
         onMouseDown={(e) => e.stopPropagation()}
-        className={`flex max-h-full w-full flex-col gap-5 overflow-y-auto rounded-panel bg-bg p-6 shadow-float ${lebar === 'form' ? 'max-w-[480px]' : 'max-w-[400px]'}`}
+        className={`flex max-h-full w-full flex-col gap-5 overflow-y-auto rounded-panel bg-bg p-5 shadow-float sm:p-6 ${lebar === 'form' ? 'max-w-[480px]' : 'max-w-[400px]'}`}
       >
         <h2 className="text-xl font-extrabold">{judul}</h2>
         {children}
@@ -211,12 +211,14 @@ const LEBAR = ['w-3/4', 'w-1/2', 'w-2/3', 'w-5/12', 'w-7/12'];
 interface SkeletonTabelProps {
   kolom: string[];
   kanan?: number[]; // indeks kolom angka (rata kanan)
+  sembunyi?: number[]; // indeks kolom yang disembunyikan di HP (<768)
   awal?: 'thumb' | 'thumbNama' | 'avatar'; // bentuk sel kolom pertama
   baris?: number;
 }
 
 // Tabel skeleton: header asli + baris balok abu, supaya tata letak tidak melompat saat data datang.
-export function SkeletonTabel({ kolom, kanan = [], awal, baris = 6 }: SkeletonTabelProps) {
+export function SkeletonTabel({ kolom, kanan = [], sembunyi = [], awal, baris = 6 }: SkeletonTabelProps) {
+  const hp = (c: number) => (sembunyi.includes(c) ? 'max-md:hidden' : '');
   const sel = (r: number, c: number) => {
     const balok = <Skeleton className={`h-3.5 ${LEBAR[(r + c) % LEBAR.length]} ${kanan.includes(c) ? 'ml-auto' : ''}`} />;
     if (c > 0 || !awal) return balok;
@@ -237,7 +239,7 @@ export function SkeletonTabel({ kolom, kanan = [], awal, baris = 6 }: SkeletonTa
         <thead>
           <tr>
             {kolom.map((k, c) => (
-              <th key={c} className={`${thCls} ${kanan.includes(c) ? 'text-right' : ''}`}>
+              <th key={c} className={`${thCls} ${kanan.includes(c) ? 'text-right' : ''} ${hp(c)}`}>
                 {k}
               </th>
             ))}
@@ -247,7 +249,7 @@ export function SkeletonTabel({ kolom, kanan = [], awal, baris = 6 }: SkeletonTa
           {Array.from({ length: baris }, (_, r) => (
             <tr key={r} className="border-b border-divider last:border-b-0">
               {kolom.map((_, c) => (
-                <td key={c} className={tdCls}>
+                <td key={c} className={`${tdCls} ${hp(c)}`}>
                   {sel(r, c)}
                 </td>
               ))}

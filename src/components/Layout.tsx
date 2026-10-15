@@ -3,7 +3,7 @@ import { BarChart3, ClipboardList, LogOut, Package, Ticket, Users, UtensilsCross
 import { NavLink, Outlet } from 'react-router';
 import { auth } from '../firebase';
 import { useAuth } from '../lib/useAuth';
-import { Avatar, Memuat, Skeleton } from './ui';
+import { Avatar } from './ui';
 
 type Item = [to: string, label: string, Icon: LucideIcon];
 
@@ -20,15 +20,16 @@ const MENU_ADMIN: Item[] = [
 
 const ROLE_LABEL = { pelanggan: 'Pelanggan', staf: 'Staf', admin: 'Admin' };
 
-// Sidebar 72 (ikon saja) di tablet 1024, 240 penuh mulai 1280.
+// HP (<768): bilah navigasi bawah ikon saja. Sidebar 72 (ikon saja) di tablet, 240 penuh mulai 1280.
 function Menu({ items }: { items: Item[] }) {
   return items.map(([to, label, Icon]) => (
     <NavLink
       key={to}
       to={to}
       title={label}
+      aria-label={label}
       className={({ isActive }) =>
-        `flex h-11 items-center justify-center gap-3 rounded-lg px-3 text-sm xl:justify-start ${
+        `flex h-11 flex-1 items-center justify-center gap-3 rounded-lg px-3 text-sm md:flex-none xl:justify-start ${
           isActive ? 'bg-primary font-bold text-white' : 'font-semibold text-secondary hover:bg-ink/4'
         }`
       }
@@ -39,47 +40,14 @@ function Menu({ items }: { items: Item[] }) {
   ));
 }
 
-// Kerangka dasbor saat sesi login masih dicek (role belum diketahui).
-export function LayoutSkeleton() {
-  return (
-    <Memuat className="flex h-dvh">
-      <aside className="flex w-[72px] shrink-0 flex-col gap-1 border-r border-divider bg-surface p-3 xl:w-60 xl:p-4">
-        <div className="mb-5 flex items-center justify-center gap-3 xl:justify-start">
-          <img src="/logo-app.png" alt="" className="size-10 rounded-full bg-bg" />
-          <div className="hidden flex-1 flex-col gap-1.5 xl:flex">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-3 w-16" />
-          </div>
-        </div>
-        {[0, 1].map((i) => (
-          <Skeleton key={i} className="h-11 rounded-lg" />
-        ))}
-        <div className="mt-auto flex flex-col gap-3 border-t border-divider pt-4">
-          <div className="flex items-center justify-center gap-3 xl:justify-start">
-            <Skeleton className="size-9 shrink-0 rounded-full" />
-            <Skeleton className="hidden h-3.5 flex-1 xl:block" />
-          </div>
-          <Skeleton className="h-11 rounded-btn" />
-        </div>
-      </aside>
-      <main className="flex min-w-0 flex-1 flex-col gap-6 p-6">
-        <div className="flex min-h-[72px] items-center">
-          <Skeleton className="h-7 w-40" />
-        </div>
-        <Skeleton className="h-80 rounded-card" />
-      </main>
-    </Memuat>
-  );
-}
-
 export default function Layout() {
   const { profil } = useAuth();
   if (!profil) return null;
 
   return (
-    <div className="flex h-dvh">
-      <aside className="flex w-[72px] shrink-0 flex-col gap-1 border-r border-divider bg-surface p-3 xl:w-60 xl:p-4">
-        <div className="mb-5 flex items-center justify-center gap-3 xl:justify-start">
+    <div className="flex h-dvh flex-col md:flex-row">
+      <aside className="order-last flex shrink-0 gap-1 border-t border-divider bg-surface p-1 md:order-none md:w-[72px] md:flex-col md:border-t-0 md:border-r md:p-3 xl:w-60 xl:p-4">
+        <div className="mb-5 hidden items-center justify-center gap-3 md:flex xl:justify-start">
           <img src="/logo-app.png" alt="KopiKita" className="size-10 rounded-full bg-bg" />
           <div className="hidden xl:block">
             <p className="text-lg leading-tight font-extrabold">KopiKita</p>
@@ -90,13 +58,13 @@ export default function Layout() {
         <Menu items={MENU_STAF} />
         {profil.role === 'admin' && (
           <>
-            <hr className="my-2 border-divider" />
+            <hr className="my-2 hidden border-divider md:block" />
             <Menu items={MENU_ADMIN} />
           </>
         )}
 
-        <div className="mt-auto flex flex-col gap-3 border-t border-divider pt-4">
-          <div className="flex items-center justify-center gap-3 xl:justify-start" title={profil.nama}>
+        <div className="contents md:mt-auto md:flex md:flex-col md:gap-3 md:border-t md:border-divider md:pt-4">
+          <div className="hidden items-center justify-center gap-3 md:flex xl:justify-start" title={profil.nama}>
             <Avatar nama={profil.nama} />
             <div className="hidden min-w-0 xl:block">
               <p className="truncate text-[13px] font-bold">{profil.nama}</p>
@@ -107,7 +75,8 @@ export default function Layout() {
             type="button"
             onClick={() => signOut(auth)}
             title="Keluar"
-            className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-btn border border-outline bg-bg text-sm font-bold hover:bg-ink/4"
+            aria-label="Keluar"
+            className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-btn text-sm font-bold text-secondary hover:bg-ink/4 md:flex-none md:border md:border-outline md:bg-bg md:text-ink"
           >
             <LogOut size={18} strokeWidth={1.8} />
             <span className="hidden xl:inline">Keluar</span>
@@ -115,7 +84,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 overflow-y-auto bg-bg p-6">
+      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto bg-bg p-4 md:p-6">
         <Outlet />
       </main>
     </div>

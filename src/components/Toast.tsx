@@ -14,7 +14,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="pointer-events-none fixed right-6 bottom-6 z-50 flex flex-col items-end gap-2" aria-live="polite">
+      <div className="pointer-events-none fixed right-4 bottom-20 z-50 md:right-6 md:bottom-6 flex flex-col items-end gap-2" aria-live="polite">
         {daftar.map((t) => (
           <div key={t.id} className="rounded-input bg-ink px-4 py-3 text-[13px] font-semibold text-cream shadow-float">
             {t.pesan}
