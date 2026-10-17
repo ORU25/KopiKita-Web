@@ -1,5 +1,12 @@
-import { CircleAlert, Inbox, ShoppingBag, UtensilsCrossed } from 'lucide-react';
-import { useEffect, useId, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
+import { ChevronDown, CircleAlert, Inbox, ShoppingBag, UtensilsCrossed } from 'lucide-react';
+import {
+  useEffect,
+  useId,
+  type ButtonHTMLAttributes,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+} from 'react';
 import { STATUS_LABEL, type Status } from '../types';
 
 // ---------- Tombol ----------
@@ -32,6 +39,17 @@ export function Button({ varian = 'utama', loading, className = '', children, di
 // ---------- Input ----------
 export const inputCls =
   'h-11 w-full rounded-input border border-outline bg-bg px-4 text-sm font-semibold text-ink outline-none placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-ink/4 disabled:text-muted';
+
+// Select native dengan panah sendiri: panah bawaan browser menempel di tepi kanan.
+// className = lebar wadah (default penuh).
+export function Select({ className = 'w-full', ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <div className={`relative ${className}`}>
+      <select className={`${inputCls} cursor-pointer appearance-none pr-10 disabled:cursor-not-allowed`} {...rest} />
+      <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted" />
+    </div>
+  );
+}
 
 interface FieldProps {
   label: string;
@@ -309,11 +327,21 @@ export const Thumb = ({ url }: { url: string }) =>
   );
 
 // Avatar inisial
-export const Avatar = ({ nama, size = 36 }: { nama: string; size?: number }) => (
+export const Avatar = ({ nama, foto, size = 36 }: { nama: string; foto?: string; size?: number }) => (
   <div
     style={{ width: size, height: size }}
-    className="flex shrink-0 items-center justify-center rounded-full bg-tint text-[13px] font-extrabold text-primary"
+    className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-tint text-[13px] font-extrabold text-primary"
   >
     {nama.trim().charAt(0).toUpperCase() || '?'}
+    {/* Inisial tetap di bawah foto: bila foto gagal dimuat, gambarnya disembunyikan. */}
+    {foto && (
+      <img
+        src={foto}
+        alt=""
+        loading="lazy"
+        onError={(e) => (e.currentTarget.style.display = 'none')}
+        className="absolute inset-0 size-full object-cover"
+      />
+    )}
   </div>
 );

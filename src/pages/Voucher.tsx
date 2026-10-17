@@ -1,4 +1,17 @@
-import { collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import {
+  arrayRemove,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useToast } from '../components/Toast';
@@ -54,8 +67,14 @@ export default function Voucher() {
   async function hapusVoucher(v: VoucherDoc) {
     setMenghapus(true);
     try {
-      await deleteDoc(doc(db, 'vouchers', v.id));
-      toast(`${v.id} dihapus`);
+      // Hapus voucher + cabut kodenya dari semua user dalam satu batch (atomik).
+      // ponytail: batch maks 500 tulisan, cukup untuk skala demo; pecah per 500 bila pemilik bisa > 499.
+      const pemilik = await getDocs(query(collection(db, 'users'), where('voucher', 'array-contains', v.id)));
+      const batch = writeBatch(db);
+      pemilik.forEach((u) => batch.update(u.ref, { voucher: arrayRemove(v.id) }));
+      batch.delete(doc(db, 'vouchers', v.id));
+      await batch.commit();
+      toast(`${v.id} dihapus${pemilik.size ? ` dan dicabut dari ${pemilik.size} pengguna` : ''}`);
       setHapus(null);
     } catch {
       toast('Gagal menghapus. Coba lagi.');
@@ -127,7 +146,7 @@ export default function Voucher() {
       {hapus && (
         <Konfirmasi
           judul={`Hapus voucher ${hapus.id}?`}
-          pesan="Pelanggan yang memiliki voucher ini tidak bisa memakainya lagi."
+          pesan="Voucher ini juga dicabut dari semua pelanggan yang memilikinya."
           label="Hapus"
           bahaya
           loading={menghapus}

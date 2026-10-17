@@ -44,8 +44,25 @@ export default function Layout() {
   const { profil } = useAuth();
   if (!profil) return null;
 
+  const keluar = () => signOut(auth);
+
   return (
     <div className="flex h-dvh flex-col md:flex-row">
+      {/* HP: bilah atas berisi profil + Keluar berlabel, agar tidak tercampur ikon navigasi bawah. */}
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-divider bg-surface px-4 md:hidden">
+        <img src="/logo-app.png" alt="KopiKita" className="size-8 rounded-full bg-bg" />
+        <p className="flex-1 text-base font-extrabold">KopiKita</p>
+        <Avatar nama={profil.nama} foto={profil.fotoUrl} size={32} />
+        <button
+          type="button"
+          onClick={keluar}
+          className="flex h-11 cursor-pointer items-center gap-2 rounded-btn border border-outline bg-bg px-3 text-sm font-bold text-ink hover:bg-ink/4"
+        >
+          <LogOut size={18} strokeWidth={1.8} />
+          Keluar
+        </button>
+      </header>
+
       <aside className="order-last flex shrink-0 gap-1 border-t border-divider bg-surface p-1 md:order-none md:w-[72px] md:flex-col md:border-t-0 md:border-r md:p-3 xl:w-60 xl:p-4">
         <div className="mb-5 hidden items-center justify-center gap-3 md:flex xl:justify-start">
           <img src="/logo-app.png" alt="KopiKita" className="size-10 rounded-full bg-bg" />
@@ -63,9 +80,9 @@ export default function Layout() {
           </>
         )}
 
-        <div className="contents md:mt-auto md:flex md:flex-col md:gap-3 md:border-t md:border-divider md:pt-4">
-          <div className="hidden items-center justify-center gap-3 md:flex xl:justify-start" title={profil.nama}>
-            <Avatar nama={profil.nama} />
+        <div className="mt-auto hidden flex-col gap-3 border-t border-divider pt-4 md:flex">
+          <div className="flex items-center justify-center gap-3 xl:justify-start" title={profil.nama}>
+            <Avatar nama={profil.nama} foto={profil.fotoUrl} />
             <div className="hidden min-w-0 xl:block">
               <p className="truncate text-[13px] font-bold">{profil.nama}</p>
               <p className="text-xs text-muted">{ROLE_LABEL[profil.role]}</p>
@@ -73,10 +90,10 @@ export default function Layout() {
           </div>
           <button
             type="button"
-            onClick={() => signOut(auth)}
+            onClick={keluar}
             title="Keluar"
             aria-label="Keluar"
-            className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-btn text-sm font-bold text-secondary hover:bg-ink/4 md:flex-none md:border md:border-outline md:bg-bg md:text-ink"
+            className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-btn border border-outline bg-bg text-sm font-bold text-ink hover:bg-ink/4"
           >
             <LogOut size={18} strokeWidth={1.8} />
             <span className="hidden xl:inline">Keluar</span>

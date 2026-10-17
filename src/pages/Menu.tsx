@@ -14,6 +14,7 @@ import {
   Kosong,
   Memuat,
   Modal,
+  Select,
   Skeleton,
   SkeletonTabel,
   tabelCls,
@@ -331,11 +332,11 @@ function FormMenu({ awal, config, urutanBaru, onClose }: FormMenuProps) {
         </Field>
         <Field label="Kategori">
           {(id) => (
-            <select id={id} value={kategori} onChange={(e) => setKategori(e.target.value as Kategori)} className={inputCls}>
+            <Select id={id} value={kategori} onChange={(e) => setKategori(e.target.value as Kategori)}>
               {KATEGORI.map((k) => (
                 <option key={k}>{k}</option>
               ))}
-            </select>
+            </Select>
           )}
         </Field>
         <div className="grid grid-cols-2 gap-4">

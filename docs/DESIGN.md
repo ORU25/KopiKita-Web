@@ -73,6 +73,7 @@ Harga: 14 / 800 `primary`. Total: 16 / 800 `primary`.
 
 ### Radius & ukuran
 
+- Select: tampilan input + `appearance-none`, panah `ChevronDown` 18 `muted` sendiri 12px dari tepi kanan (padding kanan 40) — panah bawaan browser terlalu mepet ke kanan.
 - Thumbnail produk **6** · input 8 · tombol 8 · item sidebar 8 · chip 8 · badge 6 · card/tabel 10 · panel/modal/kartu login 12 · toggle & avatar penuh.
 - Tinggi: tombol 44, input 44, baris tabel 56, item sidebar 44, header halaman 72.
 - Padding konten halaman 24; jarak antar-blok 16–24.
@@ -92,7 +93,7 @@ Ikon garis (outline) 20–24, stroke ~1.8, gaya Lucide. Boleh pakai `lucide-reac
 - Bawah sidebar: avatar inisial 36 (latar `tint`, teks `primary` 800) + nama 13/700 + role 12 muted + tombol **Keluar** (sekunder kecil).
 - **Konten** di kanan: latar `bg`, padding 24. Header halaman tinggi 72: judul 24/800 di kiri, aksi utama (mis. "+ Tambah menu") di kanan.
 - Di bawah lebar 1280 (tablet 1024) sidebar menyempit jadi 72 (ikon saja + tooltip `title`); mulai 1280 lebar 240. Tidak perlu hamburger.
-- **HP (< 768)**: sidebar pindah jadi **bilah navigasi bawah** (latar `surface`, border atas `divider`, padding 4): ikon saja, item sama lebar (tinggi 44), urutan sama + tombol Keluar (ikon, tanpa border) paling kanan. Logo, garis pemisah, dan profil disembunyikan. Padding konten 16.
+- **HP (< 768)**: sidebar pindah jadi **bilah navigasi bawah** (latar `surface`, border atas `divider`, padding 4): ikon saja, item sama lebar (tinggi 44), urutan sama — navigasi saja. Logo, garis pemisah, dan profil disembunyikan dari bilah bawah. Di atas konten ada **bilah atas** tinggi 56 (latar `surface`, border bawah `divider`, padding x 16): logo 32 + "KopiKita" 16/800 · avatar 32 · tombol sekunder **Keluar** (ikon 18 + label, tinggi 44). Padding konten 16.
 
 ### Tombol
 - Utama: tinggi 44, radius 8, latar `primary`, teks putih 14/700, padding x 20. Nonaktif: latar `disabled`.
@@ -196,14 +197,16 @@ Halaman utama kasir/barista, realtime.
 ### 3.5 Voucher (`/voucher`) — admin
 - Header: "Voucher" + "+ Tambah voucher".
 - Tabel: kode 14/800 `primary` · info · tipe & nilai ("20%" / "Rp5.000") · min. belanja · berlaku sampai (tanggal, merah bila lewat) · toggle Aktif · aksi Edit/Hapus.
+- Hapus: modal konfirmasi "Hapus voucher KOPIKITA20?" + "Voucher ini juga dicabut dari semua pelanggan yang memilikinya."; Ya → dokumen voucher dihapus dan kodenya di-`arrayRemove` dari `users/*.voucher` (satu batch). Toast menyebut jumlah pengguna yang terdampak.
 - Modal: Kode (huruf besar, tanpa spasi; tidak bisa diubah saat edit karena = ID dokumen) · Info · Tipe (segmented Persen | Potongan: wadah border `outline` radius 8, segmen tinggi 44, terpilih `primary` teks putih) · Nilai · Min. belanja · Berlaku sampai (`<input type="date">`) · Aktif.
 
 ### 3.6 Pengguna (`/pengguna`) — admin
 - Kolom cari (nama/email, filter di klien) di header.
-- Tabel: avatar inisial 32 · nama 14/700 + email 12 muted · **role** (select: Pelanggan / Staf / Admin) · jumlah voucher dimiliki · aksi "Atur voucher".
+- Tabel: avatar 40 (foto `fotoUrl` bila ada, `object-cover`; tanpa foto/gagal muat → inisial) · nama 14/700 (+ "(Anda)" 12 muted di baris sendiri) + email 12 muted, keduanya terpotong `…` · **role** (select lebar 144: Pelanggan / Staf / Admin) · jumlah voucher dimiliki (hanya kode yang vouchernya masih ada, rata kanan) · aksi "Atur voucher".
 - Admin tidak bisa menurunkan role dirinya sendiri (select nonaktif di barisnya).
+- Pagination 50 per muat (kursor `startAfter`, urut nama): tombol sekunder **"Muat lebih banyak"** di tengah bawah tabel (label "Memuat…" saat proses), hilang bila semua sudah termuat. Saat mencari dan masih ada halaman berikutnya, tampil catatan 12 muted "Pencarian hanya di N pengguna yang sudah dimuat."
 - Ubah role → modal konfirmasi "Jadikan Rina sebagai Staf?".
-- **Atur voucher**: modal berisi daftar checkbox semua voucher aktif (kode + info) → simpan ke `users/{uid}.voucher`.
+- **Atur voucher**: modal berisi daftar checkbox voucher aktif + voucher nonaktif yang masih dimiliki (label "Nonaktif" 12 muted, agar bisa dicabut) → simpan ke `users/{uid}.voucher`. Kode yang vouchernya sudah dihapus dibuang saat disimpan.
 
 ### 3.7 Laporan (`/laporan`) — admin
 - Pilihan rentang: chip "Hari ini · 7 hari · 30 hari" + tombol "Muat" (pakai `getDocs`, bukan realtime).

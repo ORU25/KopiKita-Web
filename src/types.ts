@@ -31,6 +31,7 @@ export interface UserDoc {
   favorit: string[];
   voucher: string[];
   notifikasi: boolean;
+  fotoUrl?: string; // URL Cloudinary foto profil, diisi app; opsional
   createdAt?: Timestamp;
 }
 

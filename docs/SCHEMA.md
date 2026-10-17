@@ -11,8 +11,9 @@ users/{uid}
   email: string
   role: "pelanggan" | "staf" | "admin"     // default "pelanggan" saat daftar di app
   favorit: string[]                         // productId
-  voucher: string[]                         // kode voucher yang dimiliki (diatur admin)
+  voucher: string[]                         // kode voucher yang dimiliki (diatur admin). Hapus voucher → kode dicabut dari semua user
   notifikasi: boolean
+  fotoUrl: string                           // opsional, URL Cloudinary foto profil (diisi app)
   createdAt: Timestamp
 
 products/{id}                               // id = slug nama, mis. "kopi-susu-kita"
@@ -137,6 +138,7 @@ export interface UserDoc {
   favorit: string[];
   voucher: string[];
   notifikasi: boolean;
+  fotoUrl?: string; // URL Cloudinary foto profil, diisi app; opsional
   createdAt?: Timestamp;
 }
 
@@ -242,7 +244,7 @@ Konversi dokumen: `{ id: d.id, ...d.data() } as Produk`. Saat **menulis**, janga
 | Antrean hari ini | `query(collection(db,'orders'), where('createdAt','>=', Timestamp.fromDate(awalHariIni)), orderBy('createdAt'))` — filter status di klien | `onSnapshot` | Tidak (satu field) |
 | Stok / produk | `query(collection(db,'products'), orderBy('urutan'))` | `onSnapshot` | Tidak |
 | Voucher | `collection(db,'vouchers')` | `onSnapshot` | Tidak |
-| Pengguna | `query(collection(db,'users'), orderBy('nama'), limit(200))` | `getDocs` | Tidak |
+| Pengguna | `query(collection(db,'users'), orderBy('nama'), startAfter(kursor), limit(51))` (50 per muat, +1 penanda halaman berikut) + `collection(db,'vouchers')` | `getDocs` | Tidak |
 | Laporan | `query(collection(db,'orders'), where('createdAt','>=',dari), where('createdAt','<',sampai))` — filter `status === 'selesai'` di klien | `getDocs` | Tidak |
 | Ubah status | `updateDoc(doc(db,'orders',id), { status, updatedAt: serverTimestamp() })` | — | — |
 
