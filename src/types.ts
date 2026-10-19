@@ -31,6 +31,7 @@ export interface UserDoc {
   favorit: string[];
   voucher: string[];
   notifikasi: boolean;
+  fcmTokens?: string[]; // token FCM HP pelanggan (diisi app), dipakai /api/notif
   fotoUrl?: string; // URL Cloudinary foto profil, diisi app; opsional
   createdAt?: Timestamp;
 }

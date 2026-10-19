@@ -13,8 +13,16 @@ users/{uid}
   favorit: string[]                         // productId
   voucher: string[]                         // kode voucher yang dimiliki (diatur admin). Hapus voucher → kode dicabut dari semua user
   notifikasi: boolean
+  fcmTokens: string[]                       // opsional, token FCM HP (diisi app); push dikirim api/notif.ts
   fotoUrl: string                           // opsional, URL Cloudinary foto profil (diisi app)
   createdAt: Timestamp
+
+users/{uid}/notifikasi/{id}                 // riwayat lonceng app, ditulis app pelanggan sendiri
+  judul: string
+  pesan: string
+  orderId: string
+  waktu: Timestamp
+  dibaca: boolean
 
 products/{id}                               // id = slug nama, mis. "kopi-susu-kita"
   nama: string
@@ -138,6 +146,7 @@ export interface UserDoc {
   favorit: string[];
   voucher: string[];
   notifikasi: boolean;
+  fcmTokens?: string[]; // token FCM HP pelanggan (diisi app), dipakai /api/notif
   fotoUrl?: string; // URL Cloudinary foto profil, diisi app; opsional
   createdAt?: Timestamp;
 }
@@ -273,10 +282,15 @@ service cloud.firestore {
       // Daftar dari app: hanya boleh membuat dirinya sendiri sebagai pelanggan
       allow create: if masuk() && request.auth.uid == uid
                     && request.resource.data.role == 'pelanggan';
-      // Pelanggan hanya boleh ubah nama/favorit/notifikasi; role & voucher diatur admin
+      // Pelanggan hanya boleh ubah nama/favorit/notifikasi/fcmTokens; role & voucher diatur admin
       allow update: if admin()
-                    || (request.auth.uid == uid && hanyaUbah(['nama', 'favorit', 'notifikasi']));
+                    || (request.auth.uid == uid && hanyaUbah(['nama', 'favorit', 'notifikasi', 'fcmTokens']));
       allow delete: if admin();
+
+      match /notifikasi/{nid} {
+        allow read, create: if masuk() && request.auth.uid == uid;
+        allow update: if masuk() && request.auth.uid == uid && hanyaUbah(['dibaca']);
+      }
     }
 
     match /products/{id} {

@@ -16,10 +16,17 @@ service cloud.firestore {
       // Daftar dari app: hanya boleh membuat dirinya sendiri sebagai pelanggan
       allow create: if masuk() && request.auth.uid == uid
                     && request.resource.data.role == 'pelanggan';
-      // Pelanggan hanya boleh ubah nama/favorit/notifikasi; role & voucher diatur admin
+      // Pelanggan hanya boleh ubah nama/favorit/notifikasi/fcmTokens; role & voucher diatur admin
       allow update: if admin()
-                    || (request.auth.uid == uid && hanyaUbah(['nama', 'favorit', 'notifikasi']));
+                    || (request.auth.uid == uid && hanyaUbah(['nama', 'favorit', 'notifikasi', 'fcmTokens']));
       allow delete: if admin();
+
+      // Riwayat lonceng app: ditulis app pelanggan sendiri (lib/services/notif_pesanan.dart);
+      // pelanggan hanya boleh menandai dibaca.
+      match /notifikasi/{nid} {
+        allow read, create: if masuk() && request.auth.uid == uid;
+        allow update: if masuk() && request.auth.uid == uid && hanyaUbah(['dibaca']);
+      }
     }
 
     match /products/{id} {

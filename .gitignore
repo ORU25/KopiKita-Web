@@ -26,3 +26,7 @@ dist-ssr
 # Firebase
 .env.local
 .firebase/
+
+# Service account Firebase (isi ke env Vercel, jangan di-commit)
+*serviceAccount*.json
+*-firebase-adminsdk-*.json

@@ -70,6 +70,20 @@ export default function Antrean() {
     setSibuk(p.id);
     try {
       await updateDoc(doc(db, 'orders', p.id), { status, updatedAt: serverTimestamp() });
+      // Push ke HP pelanggan lewat Vercel Function (api/notif.ts); gagal kirim tidak membatalkan ubah status.
+      // ponytail: di `npm run dev` /api tidak ada → 404 diabaikan; uji di deploy Vercel / `vercel dev`.
+      if (status === 'dibayar' || status === 'diproses' || status === 'siap') {
+        auth.currentUser
+          ?.getIdToken()
+          .then((t) =>
+            fetch('/api/notif', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId: p.id }),
+            }),
+          )
+          .catch(() => {});
+      }
       toast(`${p.nomor}: status diubah ke ${STATUS_LABEL[status]}`);
     } catch {
       toast('Gagal mengubah status. Coba lagi.');
