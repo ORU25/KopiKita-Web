@@ -162,8 +162,8 @@ Halaman utama kasir/barista, realtime.
   - Kolom scroll vertikal sendiri; urut `createdAt` terlama di atas (FIFO).
   - Kolom kosong: kotak border putus-putus `outline` radius 10, "Tidak ada pesanan" 13/600 muted.
 - **Kartu pesanan** (`bg`, border 1 `divider`, radius 10, bayangan `card`, padding 16, gap 12):
-  1. Kiri atas: nomor antrean 28/800 `ink` (+ badge "Baru" latar `caramel` teks putih selama disorot), di bawahnya badge metode. Kanan atas: ikon jam 14 + waktu sejak dibuat "5 mnt" 12/700 `secondary` dan jam pesan "17.23" 12 muted. Bila > 15 mnt di Menunggu bayar/Dibayar/Diproses: ikon peringatan + teks `danger`.
-  2. Garis `divider`, lalu daftar item: kotak jumlah "2×" (tinggi 24, radius 6, latar `ink/5`, 12/800) + nama 14/700, opsi (`labelOpsi`) 12 muted, catatan miring 12 `secondary` dalam tanda kutip.
+  1. Kiri atas: nomor antrean 28/800 `ink` (+ badge "Baru" latar `caramel` teks putih selama disorot), di bawahnya nama pemesan (ikon orang 14 muted + nama 14/700, satu baris terpotong "…" dengan tooltip nama lengkap; dibaca dari `users/{uid}` sekali per pelanggan; saat memuat "…" muted, bila tidak ada "Pelanggan"), lalu badge metode. Kanan atas: ikon jam 14 + waktu sejak dibuat "5 mnt" 12/700 `secondary` dan jam pesan "17.23" 12 muted. Bila > 15 mnt di Menunggu bayar/Dibayar/Diproses: ikon peringatan + teks `danger`.
+  2. Garis `divider`, lalu daftar item: kotak jumlah "2×" (tinggi 24, radius 6, latar `ink/5`, 12/800) + nama 14/700, opsi (`labelOpsi`) 12 muted, catatan sebagai blok (latar `fill`, radius 6, padding 6×8, margin atas 4): ikon pesan 14 `caramel` + teks 13/600 `ink`, tidak miring, tanpa tanda kutip, membungkus baris.
   3. Garis `divider`, lalu "Total · 3 item" 13 muted + total 16/800 `primary`; bila voucher: kode 12/700 `promo`.
   4. Tombol utama lebar penuh sesuai status (Konfirmasi bayar / Proses / Siap / Selesai; saat menyimpan "Menyimpan…") + tombol bahaya "Batalkan" 13/700 di bawahnya (modal konfirmasi: "Batalkan pesanan A-014?").
 - Pesanan baru masuk: border kartu `caramel` + ring 1 `caramel` (tampak 2px) + badge "Baru" selama 10 detik.

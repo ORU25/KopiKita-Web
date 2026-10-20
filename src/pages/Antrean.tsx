@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -10,8 +11,8 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { AlertTriangle, Clock, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { AlertTriangle, Clock, MessageSquareText, Plus, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '../components/Toast';
 import { Badge, Button, Galat, Header, Konfirmasi, Memuat, MetodeBadge, Skeleton } from '../components/ui';
 import { auth, db } from '../firebase';
@@ -33,6 +34,8 @@ export default function Antrean() {
   const [sibuk, setSibuk] = useState<string | null>(null);
   const [batalkan, setBatalkan] = useState<Pesanan | null>(null);
   const [, setTik] = useState(0);
+  const [nama, setNama] = useState<Record<string, string>>({});
+  const diminta = useRef(new Set<string>());
 
   // Satu listener: pesanan sejak 00.00 hari ini, status difilter di klien (tanpa index komposit).
   // ponytail: awal hari dihitung saat halaman dibuka; muat ulang halaman setelah tengah malam.
@@ -59,6 +62,19 @@ export default function Antrean() {
       () => setGalat(true),
     );
   }, [ulang]);
+
+  // Nama pemesan: orders hanya menyimpan uid, jadi baca users/{uid} sekali per uid (getDoc, bukan listener).
+  // ponytail: 1 baca per pelanggan unik per buka halaman; tulis namaPelanggan ke dokumen order bila kuota jadi masalah.
+  useEffect(() => {
+    for (const { uid } of pesanan ?? []) {
+      if (diminta.current.has(uid)) continue;
+      diminta.current.add(uid);
+      getDoc(doc(db, 'users', uid))
+        .then((d) => (d.get('nama') as string | undefined) || 'Pelanggan')
+        .catch(() => 'Pelanggan')
+        .then((n) => setNama((m) => ({ ...m, [uid]: n })));
+    }
+  }, [pesanan]);
 
   // Perbarui label "5 mnt" tiap menit (timer lokal, tidak membaca Firestore).
   useEffect(() => {
@@ -134,6 +150,7 @@ export default function Antrean() {
                       <Kartu
                         key={p.id}
                         p={p}
+                        nama={nama[p.uid]}
                         baru={baru.has(p.id)}
                         sibuk={sibuk === p.id}
                         onAksi={(st) => ubahStatus(p, st)}
@@ -186,6 +203,7 @@ const SkeletonPapan = () => (
               <Skeleton className="h-7 w-20" />
               <Skeleton className="h-3.5 w-12" />
             </div>
+            <Skeleton className="h-3.5 w-24" />
             <Skeleton className="h-6 w-28" />
             <div className="flex flex-col gap-2 border-t border-divider pt-3">
               <Skeleton className="h-3.5 w-3/4" />
@@ -209,13 +227,14 @@ const Angka = ({ label, nilai }: { label: string; nilai: number }) => (
 
 interface KartuProps {
   p: Pesanan;
+  nama?: string; // undefined = masih dimuat
   baru: boolean;
   sibuk: boolean;
   onAksi: (s: Status) => void;
   onBatal: () => void;
 }
 
-function Kartu({ p, baru, sibuk, onAksi, onBatal }: KartuProps) {
+function Kartu({ p, nama, baru, sibuk, onAksi, onBatal }: KartuProps) {
   const aksi = AKSI_BERIKUT[p.status];
   const telat = p.status !== 'siap' && menitSejak(p.createdAt) > 15;
   const jumlahItem = p.items.reduce((s, i) => s + i.jumlah, 0);
@@ -225,11 +244,15 @@ function Kartu({ p, baru, sibuk, onAksi, onBatal }: KartuProps) {
       className={`flex flex-col gap-3 rounded-card border bg-bg p-4 shadow-card transition-colors ${baru ? 'border-caramel ring-1 ring-caramel' : 'border-divider'}`}
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex items-center gap-2">
             <span className="text-[28px] leading-none font-extrabold tracking-[-0.5px]">{p.nomor}</span>
             {baru && <Badge className="bg-caramel text-white">Baru</Badge>}
           </div>
+          <p className="flex min-w-0 items-center gap-1.5 text-sm font-bold" title={nama}>
+            <User size={14} strokeWidth={2.2} className="shrink-0 text-muted" />
+            {nama ? <span className="truncate">{nama}</span> : <span className="text-muted">…</span>}
+          </p>
           <MetodeBadge makanDiTempat={p.makanDiTempat} nomorMeja={p.nomorMeja} />
         </div>
         <div className="flex shrink-0 flex-col items-end gap-0.5" title={telat ? 'Menunggu lebih dari 15 menit' : undefined}>
@@ -250,7 +273,12 @@ function Kartu({ p, baru, sibuk, onAksi, onBatal }: KartuProps) {
             <div className="min-w-0">
               <p className="text-sm leading-6 font-bold">{i.nama}</p>
               {!i.makanan && <p className="text-xs text-muted">{labelOpsi(i)}</p>}
-              {i.catatan && <p className="text-xs text-secondary italic">“{i.catatan}”</p>}
+              {i.catatan && (
+                <p className="mt-1 flex gap-1.5 rounded-md bg-fill px-2 py-1.5 text-[13px] font-semibold wrap-break-word">
+                  <MessageSquareText size={14} strokeWidth={2.2} className="mt-0.5 shrink-0 text-caramel" />
+                  <span className="min-w-0">{i.catatan}</span>
+                </p>
+              )}
             </div>
           </li>
         ))}
